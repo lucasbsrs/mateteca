@@ -8,18 +8,45 @@
 # - download is for downloading files uploaded in the db (does streaming)
 # -------------------------------------------------------------------------
 
-
+@auth.requires_login()
 def index():
-    """
-    example action using the internationalization operator T and flash
-    rendered by views/default/index.html or views/generic.html
+    response.flash = T("Bem Vindo Clan")
+    return locals()
 
-    if you need a simple wiki simply replace the two lines below with:
-    return auth.wiki()
-    """
-    response.flash = T("Hello World")
-    return dict(message=T('Welcome to web2py!'))
+@auth.requires_membership('admin')
+def cadastrar_livro():
+    response.flash = T("Cadastrar livro")
+    form = crud.create(db.livros)
 
+    # form = SQLFORM(db.livros)
+    # if form.process().accepted:
+    #    response.flash = 'Registro criado com sucesso'
+    # elif form.errors:
+    #    response.flash = 'Houve um erro: ' + str(form.errors)
+    # else:
+    #    response.flash = 'Deu pau'
+
+    return locals()
+
+@auth.requires_membership('admin')
+def alterar_livro():
+    response.flash = T("Alterar livro")
+    id_livro = request.args(0)
+    form = crud.update(db.livros, id_livro)
+    # form = SQLFORM(db.livros, record=id_livro, deletable=True)
+    # if form.process().accepted:
+    #    response.flash = 'Livro alterado'
+    # elif form.errors:
+    #    response.flash = 'Houve um erro: ' + str(form.errors)
+    # else:
+    #    response.flash = 'Deu pau'
+
+    return locals()
+
+def listar_livros():
+    #livros = db(db.livros.id > 0).select()
+    livros = SQLFORM.grid(db.livros)
+    return locals()
 
 def user():
     """
@@ -57,5 +84,3 @@ def call():
     supports xml, json, xmlrpc, jsonrpc, amfrpc, rss, csv
     """
     return service()
-
-
